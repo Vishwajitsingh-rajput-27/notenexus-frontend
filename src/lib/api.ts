@@ -1,7 +1,7 @@
 import axios from 'axios'
 import Cookies from 'js-cookie'
 
-const API = axios.create({ baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000' })
+const API = axios.create({ baseURL: 'https://notenexus-backend-y20v.onrender.com' })
 
 API.interceptors.request.use((config) => {
   const token = Cookies.get('nn_token')
