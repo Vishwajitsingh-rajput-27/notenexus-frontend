@@ -2,7 +2,6 @@
 import { useDropzone, type Accept } from 'react-dropzone'
 import { useState, useCallback } from 'react'
 import { motion } from 'framer-motion'
-import { useDropzone } from 'react-dropzone'
 import toast from 'react-hot-toast'
 import { apiUploadNote } from '@/lib/api'
 
