@@ -1,4 +1,5 @@
 'use client'
+import { useDropzone, type Accept } from 'react-dropzone'
 import { useState, useCallback } from 'react'
 import { motion } from 'framer-motion'
 import { useDropzone } from 'react-dropzone'
@@ -23,7 +24,7 @@ export default function UploadNote() {
   const curr = TYPES.find(t => t.value === type)!
 
   const onDrop = useCallback((files: File[]) => { if (files[0]) setFile(files[0]) }, [])
-  const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop, accept: curr.accept, multiple: false })
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop, accept: curr.accept as Accept, multiple: false })
 
   const handleUpload = async () => {
     if (type !== 'youtube' && !file) { toast.error('Select a file first'); return }
