@@ -15,8 +15,8 @@ export default function SignUpPage() {
   const { setAuth } = useAuthStore()
   const router = useRouter()
 
-  const handle = async (e: React.FormEvent) => {
-    e.preventDefault()
+  const handle = async () => {
+    if (!name || !email || !password) { toast.error('All fields required'); return }
     if (password.length < 6) { toast.error('Password must be at least 6 characters'); return }
     setLoading(true)
     try {
@@ -38,30 +38,32 @@ export default function SignUpPage() {
           <h1 className="text-2xl font-bold text-gradient">Create your account</h1>
           <p className="text-slate-400 text-sm mt-1">Start organising your notes with AI</p>
         </div>
-        <form onSubmit={handle} className="space-y-4">
+        <div className="space-y-4">
           <div>
             <label className="block text-sm text-slate-400 mb-1">Full Name</label>
-            <input type="text" value={name} onChange={e => setName(e.target.value)} required
+            <input type="text" value={name} onChange={e => setName(e.target.value)}
               className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 transition"
               placeholder="Your Name" />
           </div>
           <div>
             <label className="block text-sm text-slate-400 mb-1">Email</label>
-            <input type="email" value={email} onChange={e => setEmail(e.target.value)} required
+            <input type="email" value={email} onChange={e => setEmail(e.target.value)}
               className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 transition"
               placeholder="you@example.com" />
           </div>
           <div>
             <label className="block text-sm text-slate-400 mb-1">Password</label>
-            <input type="password" value={password} onChange={e => setPassword(e.target.value)} required
+            <input type="password" value={password} onChange={e => setPassword(e.target.value)}
               className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 transition"
               placeholder="Min 6 characters" />
           </div>
-          <motion.button whileHover={{ scale:1.01 }} whileTap={{ scale:0.98 }} type="submit" disabled={loading}
+          <button
+            onClick={handle}
+            disabled={loading}
             className="w-full bg-blue-600 hover:bg-blue-500 disabled:opacity-50 rounded-xl py-3 font-bold text-white transition">
             {loading ? 'Creating account…' : 'Create Account'}
-          </motion.button>
-        </form>
+          </button>
+        </div>
         <p className="text-center text-slate-400 text-sm mt-6">
           Already have an account? <Link href="/sign-in" className="text-blue-400 hover:text-blue-300">Sign in</Link>
         </p>
