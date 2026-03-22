@@ -10,6 +10,7 @@ import SearchBar    from '@/components/notes/SearchBar'
 import Flashcards   from '@/components/revision/Flashcards'
 import MindMap      from '@/components/revision/MindMap'
 import ClassHub     from '@/components/notes/ClassHub'
+import Profile      from '@/components/profile/Profile'
 import { useSocket } from '@/hooks/useSocket'
 import { useEffect } from 'react'
 
@@ -20,6 +21,7 @@ const TABS = [
   { id: 'flashcards', icon: '🃏', label: 'Flashcards'  },
   { id: 'mindmap',    icon: '🗺️', label: 'Mind Map'   },
   { id: 'class',      icon: '👥', label: 'Class Hub'   },
+  { id: 'profile',    icon: '👤', label: 'Profile'     },
 ]
 
 export default function DashboardPage() {
@@ -28,7 +30,6 @@ export default function DashboardPage() {
   const router = useRouter()
   const socket = useSocket()
 
-  // Listen for live shared-note alerts
   useEffect(() => {
     if (!socket) return
     socket.on('shared-note-alert', ({ title, sharedBy }: any) => {
@@ -47,13 +48,11 @@ export default function DashboardPage() {
     <div className="flex h-screen overflow-hidden">
       {/* Sidebar */}
       <aside className="w-16 md:w-56 glass border-r border-white/5 flex flex-col py-4 shrink-0">
-        {/* Logo */}
         <div className="px-4 mb-8 flex items-center gap-2">
           <span className="text-2xl">📚</span>
           <span className="hidden md:block font-bold text-gradient text-lg">NoteNexus</span>
         </div>
 
-        {/* Nav tabs */}
         <nav className="flex-1 space-y-1 px-2">
           {TABS.map(t => (
             <motion.button key={t.id} whileHover={{ x:2 }} whileTap={{ scale:0.97 }}
@@ -67,7 +66,6 @@ export default function DashboardPage() {
           ))}
         </nav>
 
-        {/* User */}
         <div className="px-3 pt-4 border-t border-white/5">
           <div className="flex items-center gap-2 mb-2 px-1">
             <div className="w-7 h-7 rounded-full bg-blue-600 flex items-center justify-center text-xs font-bold shrink-0">
@@ -87,7 +85,6 @@ export default function DashboardPage() {
 
       {/* Main content */}
       <main className="flex-1 overflow-y-auto">
-        {/* Top bar */}
         <div className="sticky top-0 z-10 glass border-b border-white/5 px-6 py-4 flex items-center justify-between">
           <div>
             <h1 className="font-bold text-white text-lg">{TABS.find(t => t.id === tab)?.icon} {TABS.find(t => t.id === tab)?.label}</h1>
@@ -99,7 +96,6 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* Tab content */}
         <div className="p-6 max-w-5xl mx-auto">
           <AnimatePresence mode="wait">
             <motion.div key={tab}
@@ -111,6 +107,7 @@ export default function DashboardPage() {
               {tab === 'flashcards' && <Flashcards />}
               {tab === 'mindmap'    && <MindMap />}
               {tab === 'class'      && <ClassHub />}
+              {tab === 'profile'    && <Profile />}
             </motion.div>
           </AnimatePresence>
         </div>
