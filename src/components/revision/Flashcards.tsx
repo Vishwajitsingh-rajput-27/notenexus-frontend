@@ -14,8 +14,8 @@ const sourceIcon = (type: string) => {
   return '📝'
 }
 
-export default function Flashcards() {
-  const [text, setText]       = useState('')
+export default function Flashcards({ preloadContent = '' }: { preloadContent?: string }) {
+  const [text, setText]       = useState(preloadContent)
   const [mode, setMode]       = useState<Mode>('flashcards')
   const [cards, setCards]     = useState<any[]>([])
   const [idx, setIdx]         = useState(0)
@@ -26,6 +26,14 @@ export default function Flashcards() {
   const [loadingNotes, setLoadingNotes] = useState(false)
   const [selectedNote, setSelectedNote] = useState('')
   const [loadedFrom, setLoadedFrom]     = useState('')
+
+  useEffect(() => {
+    if (preloadContent) {
+      setText(preloadContent)
+      setSelectedNote('')
+      setLoadedFrom('')
+    }
+  }, [preloadContent])
 
   useEffect(() => {
     const fetchNotes = async () => {
