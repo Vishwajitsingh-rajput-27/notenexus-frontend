@@ -218,7 +218,6 @@ export default function AiTutor({ preloadSubject = '' }) {
     </div>
   );
 }
-}
 
       {/* Suggestions */}
       {history.length < 2 && !quiz && (
