@@ -13,6 +13,11 @@ import ClassHub     from '@/components/notes/ClassHub'
 import Profile      from '@/components/profile/Profile'
 import { useSocket } from '@/hooks/useSocket'
 import { useEffect } from 'react'
+import ExamPredictor     from '@/components/ExamPredictor'
+import StudyPlanner      from '@/components/StudyPlanner'
+import AiTutor           from '@/components/AiTutor'
+import RevisionReminders from '@/components/RevisionReminders'
+import WhatsAppBot       from '@/components/WhatsAppBot'
 
 const TABS = [
   { id: 'upload',     icon: '📤', label: 'Upload'      },
@@ -22,6 +27,11 @@ const TABS = [
   { id: 'mindmap',    icon: '🗺️', label: 'Mind Map'   },
   { id: 'class',      icon: '👥', label: 'Class Hub'   },
   { id: 'profile',    icon: '👤', label: 'Profile'     },
+  { id: 'exam',      icon: '🎯', label: 'Exam Predictor' },
+  { id: 'planner',   icon: '📅', label: 'Study Planner'  },
+  { id: 'tutor',     icon: '🤖', label: 'AI Tutor'       },
+  { id: 'reminders', icon: '⏰', label: 'Reminders'      },
+  { id: 'whatsapp',  icon: '📱', label: 'WhatsApp Bot'   },
 ]
 
 export default function DashboardPage() {
@@ -108,6 +118,11 @@ export default function DashboardPage() {
               {tab === 'mindmap'    && <MindMap />}
               {tab === 'class'      && <ClassHub />}
               {tab === 'profile'    && <Profile />}
+              {tab === 'exam'      && <ExamPredictor />}
+              {tab === 'planner'   && <StudyPlanner />}
+              {tab === 'tutor'     && <AiTutor />}
+              {tab === 'reminders' && <RevisionReminders />}
+              {tab === 'whatsapp'  && <WhatsAppBot />}
             </motion.div>
           </AnimatePresence>
         </div>
