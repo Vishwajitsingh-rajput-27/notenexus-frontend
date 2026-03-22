@@ -48,14 +48,22 @@ function Node({ node, depth = 0, color = '#3b82f6' }: { node: MNode; depth?: num
   )
 }
 
-export default function MindMap() {
-  const [text, setText]       = useState('')
+export default function MindMap({ preloadContent = '' }: { preloadContent?: string }) {
+  const [text, setText]       = useState(preloadContent)
   const [map, setMap]         = useState<MMap | null>(null)
   const [loading, setLoading] = useState(false)
   const [notes, setNotes]     = useState<any[]>([])
   const [loadingNotes, setLoadingNotes] = useState(false)
   const [selectedNote, setSelectedNote] = useState('')
   const [loadedFrom, setLoadedFrom]     = useState('')
+
+  useEffect(() => {
+    if (preloadContent) {
+      setText(preloadContent)
+      setSelectedNote('')
+      setLoadedFrom('')
+    }
+  }, [preloadContent])
 
   useEffect(() => {
     const fetchNotes = async () => {
