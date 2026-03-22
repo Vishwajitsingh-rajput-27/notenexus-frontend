@@ -9,7 +9,23 @@ const SOURCE_ICONS: Record<string, string> = {
   pdf: '📄', image: '🖼️', youtube: '▶️', voice: '🎙️', whatsapp: '💬', text: '📝'
 }
 
-export default function NotesList() {
+// Which tab id maps to each AI feature
+// These must match the TABS ids in your dashboard page
+const AI_ACTIONS = [
+  { label: '🎯 Exam',     tab: 'exam'      },
+  { label: '📅 Planner',  tab: 'planner'   },
+  { label: '🤖 Tutor',    tab: 'tutor'     },
+  { label: '🃏 Flashcard',tab: 'flashcards'},
+  { label: '🗺️ MindMap', tab: 'mindmap'   },
+]
+
+interface NotesListProps {
+  // Called when user clicks an AI action button on a note
+  // Parent (dashboard) handles switching tab and passing note content
+  onSendToAI?: (tab: string, note: any) => void
+}
+
+export default function NotesList({ onSendToAI }: NotesListProps) {
   const [notes, setNotes]       = useState<any[]>([])
   const [subjects, setSubjects] = useState<string[]>([])
   const [filter, setFilter]     = useState('')
@@ -48,6 +64,15 @@ export default function NotesList() {
         socket.emit('new-shared-note', { title: note?.title, subject: note?.subject, userName: 'You' })
       }
     } catch { toast.error('Failed') }
+  }
+
+  const handleAIAction = (tab: string, note: any) => {
+    if (onSendToAI) {
+      onSendToAI(tab, note)
+      toast.success(`Opening ${tab} with this note...`)
+    } else {
+      toast('Open the ' + tab + ' tab and load this note from the picker', { icon: '💡' })
+    }
   }
 
   return (
@@ -92,6 +117,8 @@ export default function NotesList() {
                 initial={{ opacity:0, y:10 }} animate={{ opacity:1, y:0 }} exit={{ opacity:0, x:-20 }}
                 transition={{ delay: i * 0.04 }}
                 className="glass rounded-2xl overflow-hidden glass-hover transition">
+
+                {/* Note header row */}
                 <div className="flex items-center gap-3 p-4 cursor-pointer"
                   onClick={() => setExpanded(expanded === note._id ? null : note._id)}>
                   <span className="text-2xl shrink-0">{SOURCE_ICONS[note.sourceType] || '📝'}</span>
@@ -117,19 +144,48 @@ export default function NotesList() {
                     <span className="text-slate-600 text-sm">{expanded === note._id ? '▲' : '▼'}</span>
                   </div>
                 </div>
-                <AnimatePresence>
-                  {expanded === note._id && note.keywords?.length > 0 && (
-                    <motion.div initial={{ height:0, opacity:0 }} animate={{ height:'auto', opacity:1 }} exit={{ height:0, opacity:0 }}
-                      className="border-t border-white/5 px-4 py-3 overflow-hidden">
-                      <p className="text-xs text-slate-500 mb-2">Keywords</p>
-                      <div className="flex flex-wrap gap-1.5">
-                        {note.keywords.map((k: string) => (
-                          <span key={k} className="bg-yellow-500/10 text-yellow-400 text-xs px-2 py-0.5 rounded">{k}</span>
+
+                {/* Expanded panel — keywords + AI action buttons */}
+                {expanded === note._id && (
+                  <div className="border-t border-white/5 px-4 py-4 space-y-4">
+
+                    {/* Keywords */}
+                    {note.keywords?.length > 0 && (
+                      <div>
+                        <p className="text-xs text-slate-500 mb-2">Keywords</p>
+                        <div className="flex flex-wrap gap-1.5">
+                          {note.keywords.map((k: string) => (
+                            <span key={k} className="bg-yellow-500/10 text-yellow-400 text-xs px-2 py-0.5 rounded">{k}</span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Note preview */}
+                    {(note.content || note.rawText || note.summary) && (
+                      <div>
+                        <p className="text-xs text-slate-500 mb-2">Preview</p>
+                        <p className="text-xs text-slate-400 bg-black/20 rounded-lg p-3 line-clamp-3 border border-white/5">
+                          {(note.content || note.rawText || note.summary || '').slice(0, 300)}...
+                        </p>
+                      </div>
+                    )}
+
+                    {/* AI Feature buttons */}
+                    <div>
+                      <p className="text-xs text-slate-500 mb-2">🤖 Use this note with AI features</p>
+                      <div className="flex flex-wrap gap-2">
+                        {AI_ACTIONS.map(action => (
+                          <button key={action.tab}
+                            onClick={e => { e.stopPropagation(); handleAIAction(action.tab, note) }}
+                            className="text-xs px-3 py-1.5 rounded-lg bg-blue-600/20 text-blue-400 border border-blue-500/30 hover:bg-blue-600/30 transition font-medium">
+                            {action.label}
+                          </button>
                         ))}
                       </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
+                    </div>
+                  </div>
+                )}
               </motion.div>
             ))}
           </AnimatePresence>
