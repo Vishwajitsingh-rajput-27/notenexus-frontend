@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useAuthStore } from '@/lib/store'
 import { useRouter } from 'next/navigation'
@@ -20,18 +20,18 @@ import RevisionReminders from '@/components/RevisionReminders'
 import WhatsAppBot       from '@/components/WhatsAppBot'
 
 const TABS = [
-  { id: 'upload',     icon: '📤', label: 'Upload'      },
-  { id: 'notes',      icon: '📋', label: 'My Notes'    },
-  { id: 'search',     icon: '🔍', label: 'Search'      },
-  { id: 'flashcards', icon: '🃏', label: 'Flashcards'  },
-  { id: 'mindmap',    icon: '🗺️', label: 'Mind Map'   },
-  { id: 'class',      icon: '👥', label: 'Class Hub'   },
-  { id: 'profile',    icon: '👤', label: 'Profile'     },
-  { id: 'exam',      icon: '🎯', label: 'Exam Predictor' },
-  { id: 'planner',   icon: '📅', label: 'Study Planner'  },
-  { id: 'tutor',     icon: '🤖', label: 'AI Tutor'       },
-  { id: 'reminders', icon: '⏰', label: 'Reminders'      },
-  { id: 'whatsapp',  icon: '📱', label: 'WhatsApp Bot'   },
+  { id: 'upload',     icon: '📤', label: 'Upload'         },
+  { id: 'notes',      icon: '📋', label: 'My Notes'       },
+  { id: 'search',     icon: '🔍', label: 'Search'         },
+  { id: 'flashcards', icon: '🃏', label: 'Flashcards'     },
+  { id: 'mindmap',    icon: '🗺️', label: 'Mind Map'      },
+  { id: 'class',      icon: '👥', label: 'Class Hub'      },
+  { id: 'profile',    icon: '👤', label: 'Profile'        },
+  { id: 'exam',       icon: '🎯', label: 'Exam Predictor' },
+  { id: 'planner',    icon: '📅', label: 'Study Planner'  },
+  { id: 'tutor',      icon: '🤖', label: 'AI Tutor'       },
+  { id: 'reminders',  icon: '⏰', label: 'Reminders'      },
+  { id: 'whatsapp',   icon: '📱', label: 'WhatsApp Bot'   },
 ]
 
 export default function DashboardPage() {
@@ -39,6 +39,9 @@ export default function DashboardPage() {
   const { user, logout } = useAuthStore()
   const router = useRouter()
   const socket = useSocket()
+
+  // Shared note content state — passed from NotesList into AI features
+  const [activeNote, setActiveNote] = useState<{ content: string; subject: string; title: string } | null>(null)
 
   useEffect(() => {
     if (!socket) return
@@ -54,6 +57,18 @@ export default function DashboardPage() {
     toast.success('Logged out')
   }
 
+  // Called by NotesList when user clicks an AI action button
+  // Switches tab and pre-loads note content into the target feature
+  const handleSendToAI = useCallback((targetTab: string, note: any) => {
+    const content = note.content || note.rawText || note.summary || ''
+    setActiveNote({
+      content,
+      subject: note.subject || '',
+      title: note.title || '',
+    })
+    setTab(targetTab)
+  }, [])
+
   return (
     <div className="flex h-screen overflow-hidden">
       {/* Sidebar */}
@@ -63,7 +78,7 @@ export default function DashboardPage() {
           <span className="hidden md:block font-bold text-gradient text-lg">NoteNexus</span>
         </div>
 
-        <nav className="flex-1 space-y-1 px-2">
+        <nav className="flex-1 space-y-1 px-2 overflow-y-auto">
           {TABS.map(t => (
             <motion.button key={t.id} whileHover={{ x:2 }} whileTap={{ scale:0.97 }}
               onClick={() => setTab(t.id)}
@@ -97,8 +112,18 @@ export default function DashboardPage() {
       <main className="flex-1 overflow-y-auto">
         <div className="sticky top-0 z-10 glass border-b border-white/5 px-6 py-4 flex items-center justify-between">
           <div>
-            <h1 className="font-bold text-white text-lg">{TABS.find(t => t.id === tab)?.icon} {TABS.find(t => t.id === tab)?.label}</h1>
-            <p className="text-slate-500 text-xs">Hi {user?.name?.split(' ')[0]} 👋 — what are we learning today?</p>
+            <h1 className="font-bold text-white text-lg">
+              {TABS.find(t => t.id === tab)?.icon} {TABS.find(t => t.id === tab)?.label}
+            </h1>
+            <p className="text-slate-500 text-xs">
+              Hi {user?.name?.split(' ')[0]} 👋 — what are we learning today?
+              {/* Show active note banner if a note was loaded into current AI tab */}
+              {activeNote && ['exam','planner','tutor','flashcards','mindmap'].includes(tab) && (
+                <span className="ml-2 bg-blue-600/20 text-blue-400 text-xs px-2 py-0.5 rounded-full border border-blue-500/30">
+                  📋 {activeNote.title}
+                </span>
+              )}
+            </p>
           </div>
           <div className="flex items-center gap-2">
             <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
@@ -111,18 +136,36 @@ export default function DashboardPage() {
             <motion.div key={tab}
               initial={{ opacity:0, y:12 }} animate={{ opacity:1, y:0 }} exit={{ opacity:0, y:-8 }}
               transition={{ duration:0.18 }}>
+
+              {/* Existing tabs */}
               {tab === 'upload'     && <UploadNote />}
-              {tab === 'notes'      && <NotesList />}
+              {tab === 'notes'      && <NotesList onSendToAI={handleSendToAI} />}
               {tab === 'search'     && <SearchBar />}
-              {tab === 'flashcards' && <Flashcards />}
-              {tab === 'mindmap'    && <MindMap />}
+              {tab === 'flashcards' && <Flashcards preloadContent={activeNote?.content} />}
+              {tab === 'mindmap'    && <MindMap preloadContent={activeNote?.content} />}
               {tab === 'class'      && <ClassHub />}
               {tab === 'profile'    && <Profile />}
-              {tab === 'exam'      && <ExamPredictor />}
-              {tab === 'planner'   && <StudyPlanner />}
-              {tab === 'tutor'     && <AiTutor />}
+
+              {/* New AI feature tabs — all receive note content when loaded from NotesList */}
+              {tab === 'exam'      && (
+                <ExamPredictor
+                  preloadContent={activeNote?.content || ''}
+                  preloadSubject={activeNote?.subject || ''}
+                />
+              )}
+              {tab === 'planner'   && (
+                <StudyPlanner
+                  preloadSubject={activeNote?.subject || ''}
+                />
+              )}
+              {tab === 'tutor'     && (
+                <AiTutor
+                  preloadSubject={activeNote?.subject || ''}
+                />
+              )}
               {tab === 'reminders' && <RevisionReminders />}
               {tab === 'whatsapp'  && <WhatsAppBot />}
+
             </motion.div>
           </AnimatePresence>
         </div>
