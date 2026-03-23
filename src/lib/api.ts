@@ -52,8 +52,8 @@ export const apiDeleteNote = async (id: string) => {
   return data
 }
 
-export const apiShareNote = async (id: string, classId: string) => {
-  const { data } = await api.post(`/notes/${id}/share`, { classId })
+export const apiShareNote = async (id: string, share: boolean | string) => {
+  const { data } = await api.post(`/notes/${id}/share`, { share })
   return data
 }
 
