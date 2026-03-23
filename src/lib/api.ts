@@ -36,8 +36,9 @@ export const apiUploadNote = async (formData: FormData) => {
   return data
 }
 
-export const apiGetNotes = async (params?: { subject?: string; page?: number }) => {
-  const { data } = await api.get('/notes', { params })
+export const apiGetNotes = async (params?: { subject?: string; page?: number } | string) => {
+  const query = typeof params === 'string' ? { subject: params } : params
+  const { data } = await api.get('/notes', { params: query })
   return data
 }
 
