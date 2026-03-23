@@ -15,6 +15,7 @@ interface AuthState {
   setAuth: (user: User, token: string) => void
   logout: () => void
   isAuthenticated: () => boolean
+  updateUser: (partial: Partial<User>) => void
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -36,6 +37,11 @@ export const useAuthStore = create<AuthState>()(
       isAuthenticated: () => {
         const { token } = get()
         return !!token && !!Cookies.get('nn_token')
+      },
+
+      updateUser: (partial) => {
+        const { user } = get()
+        if (user) set({ user: { ...user, ...partial } })
       },
     }),
     {
