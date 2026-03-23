@@ -82,7 +82,7 @@ const DARK = {
   footerLink:  'rgba(255,255,255,0.4)',
   footerVer:   'rgba(255,255,255,0.2)',
   scrollbar:   'rgba(255,255,255,0.15)',
-} as const
+}
 
 const LIGHT = {
   bg:          '#f0ede6',
@@ -113,9 +113,9 @@ const LIGHT = {
   footerLink:  'rgba(0,0,0,0.5)',
   footerVer:   'rgba(0,0,0,0.3)',
   scrollbar:   'rgba(0,0,0,0.2)',
-} as const
+}
 
-type Tok = typeof DARK
+type Tok = Record<string, string>
 
 // ── Reusable animated section title ──────────────────────────────────────────
 function SectionTitle({ white, yellow, tok }: { white: string; yellow: string; tok: Tok }) {
@@ -200,6 +200,26 @@ function FeatureCard({ group, items, index, tok }: { group: string; items: strin
   )
 }
 
+// ── Stack tag (own component — fixes useState-in-map hooks violation) ──────────
+function StackTag({ tech, tok }: { tech: string; tok: Tok }) {
+  const [hov, setHov] = useState(false)
+  return (
+    <span
+      onMouseEnter={() => setHov(true)}
+      onMouseLeave={() => setHov(false)}
+      style={{
+        fontFamily: "'IBM Plex Mono',monospace",
+        fontSize: 12, padding: '5px 12px',
+        border: `1px solid ${hov ? tok.yellow : tok.border}`,
+        color: hov ? tok.yellow : tok.fgDim,
+        letterSpacing: '0.04em',
+        transition: 'border-color 0.18s, color 0.18s',
+        cursor: 'default',
+      }}
+    >{tech}</span>
+  )
+}
+
 // ── Stack category ────────────────────────────────────────────────────────────
 function StackCategory({ cat, items, delay, tok }: { cat: string; items: string[]; delay: number; tok: Tok }) {
   const ref = useRef(null)
@@ -220,25 +240,7 @@ function StackCategory({ cat, items, delay, tok }: { cat: string; items: string[
         transition: 'color 0.4s, border-color 0.4s',
       }}>{cat}</div>
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-        {items.map(tech => {
-          const [hov, setHov] = useState(false)
-          return (
-            <span
-              key={tech}
-              onMouseEnter={() => setHov(true)}
-              onMouseLeave={() => setHov(false)}
-              style={{
-                fontFamily: "'IBM Plex Mono',monospace",
-                fontSize: 12, padding: '5px 12px',
-                border: `1px solid ${hov ? tok.yellow : tok.border}`,
-                color: hov ? tok.yellow : tok.fgDim,
-                letterSpacing: '0.04em',
-                transition: 'border-color 0.18s, color 0.18s',
-                cursor: 'default',
-              }}
-            >{tech}</span>
-          )
-        })}
+        {items.map(tech => <StackTag key={tech} tech={tech} tok={tok} />)}
       </div>
     </motion.div>
   )
