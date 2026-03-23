@@ -1,0 +1,35 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=IBM+Plex+Mono:wght@300;400;500&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* { box-sizing: border-box; cursor: none !important; }
+body {
+  font-family: 'IBM Plex Mono', 'Courier New', monospace;
+  background: #0a0a0a;
+  color: #ffffff;
+}
+
+::selection {
+  background: #FBFF48;
+  color: #000;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: #0a0a0a; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); }
+
+/* Keep card-flip logic from original intact */
+.flip-card { perspective: 1000px; }
+.flip-inner { transition: transform 0.5s; transform-style: preserve-3d; position: relative; }
+.flip-inner.flipped { transform: rotateY(180deg); }
+.flip-front, .flip-back { backface-visibility: hidden; -webkit-backface-visibility: hidden; }
+.flip-back { transform: rotateY(180deg); position: absolute; inset: 0; }
+
+/* Toast overrides for brutalist look */
+[data-hot-toast] {
+  font-family: 'IBM Plex Mono', monospace !important;
+  border-radius: 0 !important;
+  border: 1px solid rgba(255,255,255,0.15) !important;
+}
