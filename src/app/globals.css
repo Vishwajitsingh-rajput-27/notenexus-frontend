@@ -1,13 +1,30 @@
-@import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=IBM+Plex+Mono:wght@300;400;500&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-* { box-sizing: border-box; cursor: none !important; }
+/* ── RESET ALL OLD STYLES ── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* ── BRUTALIST BASE ── */
+html {
+  scroll-behavior: smooth;
+}
+
 body {
-  font-family: 'IBM Plex Mono', 'Courier New', monospace;
   background: #0a0a0a;
   color: #ffffff;
+  font-family: 'IBM Plex Mono', 'Courier New', monospace;
+  overflow-x: hidden;
+}
+
+/* light mode body override */
+body.light {
+  background: #f0ede6;
+  color: #0a0a0a;
 }
 
 ::selection {
@@ -15,21 +32,16 @@ body {
   color: #000;
 }
 
-/* Scrollbar */
 ::-webkit-scrollbar { width: 4px; }
 ::-webkit-scrollbar-track { background: #0a0a0a; }
-::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 2px; }
 
-/* Keep card-flip logic from original intact */
+body.light::-webkit-scrollbar-track { background: #f0ede6; }
+body.light::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.2); }
+
+/* ── CARD FLIP (keep existing dashboard logic) ── */
 .flip-card { perspective: 1000px; }
 .flip-inner { transition: transform 0.5s; transform-style: preserve-3d; position: relative; }
 .flip-inner.flipped { transform: rotateY(180deg); }
 .flip-front, .flip-back { backface-visibility: hidden; -webkit-backface-visibility: hidden; }
 .flip-back { transform: rotateY(180deg); position: absolute; inset: 0; }
-
-/* Toast overrides for brutalist look */
-[data-hot-toast] {
-  font-family: 'IBM Plex Mono', monospace !important;
-  border-radius: 0 !important;
-  border: 1px solid rgba(255,255,255,0.15) !important;
-}
